@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+_home="$(dirname "$(realpath "$0")")"
+fail_log="${_home}/install_fail"
+shopt -s globstar nullglob
+dirs=( autoload  colors  doc  ftdetect  plugin  syntax )
+
+rm "$fail_log" &> /dev/null
+
+for i in "${dirs[@]}"; do
+  if ! cd "$i"; then
+    printf "Failed to change directory; bailing out...\n" >&2
+    exit 1
+  fi
+
+  while read -r j; do
+    rel_name="$(printf "%s" "$j" | awk '{printf("%s\n", substr($0, index($0, "/'"$i"'/") + length("/'"$i"'/")))}')"
+    dir_name="$(dirname "$rel_name")"
+
+    [ "$dir_name" != '.' ] && mkdir -p "$dir_name"
+    if [ -e "$rel_name" ]; then
+      printf "%s/%s exists (%s)\n" "$i" "$rel_name" "$j" >> "$fail_log"
+    else
+      ln -s "$(realpath --relative-to="$dir_name" "$j")" "$rel_name"
+    fi
+  done < <(find ../git -path '../git/*/'"$i"'/*' -type f)
+
+  if ! cd ..; then
+    printf "Failed to change directory; bailing out...\n" >&2
+    exit 1
+  fi
+done

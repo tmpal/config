@@ -1,0 +1,15 @@
+[user]
+	name = Tim Palace
+	email = timothypalace@gmail.com
+[core]
+	editor = vim
+[color]
+	ui = auto
+[push]
+	default = upstream
+[log]
+	follow = true
+[alias]
+  	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%an, %cr)%Creset' --abbrev-commit --date=relative
+[alias]
+	nb = "!sh -c 'git checkout -b \"$1\" -t ${2:-$(git rev-parse --abbrev-ref --symbolic-full-name @\\{u\\})}' -"
